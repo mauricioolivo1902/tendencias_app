@@ -1,0 +1,39 @@
+<%# app/views/admin/motivational_phrases/index.html.erb %>
+<h1>Gestión de Frases Motivacionales</h1>
+
+<p>
+  <%= link_to "Nueva Frase Motivacional", new_admin_motivational_phrase_path, class: "button is-primary" %>
+  <%# El class "button is-primary" es un ejemplo de Bulma/Bootstrap %>
+</p>
+
+<% if @motivational_phrases.any? %>
+  <table border="1" style="width:100%; border-collapse: collapse;"> <%# Estilos básicos en línea, idealmente esto iría en CSS %>
+    <thead>
+      <tr>
+        <th>Contenido de la Frase</th>
+        <th>Creada</th>
+        <th>Actualizada</th>
+        <th colspan="2">Acciones</th> <%# Colspan 2 para Edit y Delete %>
+      </tr>
+    </thead>
+    <tbody>
+      <% @motivational_phrases.each do |phrase| %>
+        <tr>
+          <td><%= phrase.content %></td>
+          <td><%= l phrase.created_at, format: :short %></td> <%# Formato de fecha corto %>
+          <td><%= l phrase.updated_at, format: :short %></td>
+          <td><%= link_to "Editar", edit_admin_motivational_phrase_path(phrase) %></td>
+          <td>
+            <%# button_to para delete es más semántico y seguro %>
+            <%= button_to "Eliminar", admin_motivational_phrase_path(phrase), method: :delete, data: { turbo_confirm: "¿Estás seguro de que quieres eliminar esta frase?" } %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <p>No hay frases motivacionales creadas todavía. ¡Crea la primera!</p>
+<% end %>
+
+<br>
+<%= link_to "Volver al Dashboard", admin_dashboard_path %>

@@ -1,0 +1,8 @@
+<%# app/views/admin/motivational_phrases/edit.html.erb %>
+<h1>Editar Frase Motivacional</h1>
+
+<%= render 'form', motivational_phrase: @motivational_phrase %>
+
+<br>
+<%= link_to 'Mostrar', [:admin, @motivational_phrase] %> | <%# Opcional, si tuvieras una vista 'show' %>
+<%= link_to 'Volver a la lista', admin_motivational_phrases_path %>

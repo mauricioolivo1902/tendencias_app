@@ -1,0 +1,25 @@
+<%# app/views/admin/motivational_phrases/_form.html.erb %>
+
+<%# El objeto 'form' será pasado desde la vista new.html.erb o edit.html.erb %>
+<%# model: [@motivational_phrase.class.module_parent_name.to_s.downcase, @motivational_phrase] asegura que la URL sea correcta para el namespace admin %>
+<%= form_with(model: [:admin, @motivational_phrase], local: true) do |form| %>
+  <% if @motivational_phrase.errors.any? %>
+    <div id="error_explanation" style="color: red;">
+      <h2><%= pluralize(@motivational_phrase.errors.count, "error") %> impidió guardar esta frase:</h2>
+      <ul>
+        <% @motivational_phrase.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= form.label :content, "Contenido de la Frase" %>
+    <%= form.text_area :content, rows: 3, required: true %>
+  </div>
+
+  <div class="actions">
+    <%= form.submit "Guardar Frase" %>
+  </div>
+<% end %>

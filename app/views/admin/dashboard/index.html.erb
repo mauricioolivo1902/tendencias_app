@@ -1,0 +1,20 @@
+<%# app/views/admin/dashboard/index.html.erb %>
+<h1>Panel de Administración</h1>
+
+<% if current_user %>
+  <p>¡Bienvenido al área de administración, <%= current_user.email %>!</p>
+  <p>User ID en sesión: <%= session[:user_id] %></p>
+
+  <hr>
+  <h2>Gestión de Contenido</h2>
+  <ul>
+    <li><%= link_to "Gestionar Frases Motivacionales", admin_motivational_phrases_path %></li>
+    <%# Aquí irán enlaces a gestión de productos, etc. %>
+  </ul>
+  <hr>
+
+  <%= button_to "Cerrar Sesión", logout_path, method: :delete %>
+<% else %>
+  <p>No has iniciado sesión correctamente o tu sesión ha expirado.</p>
+  <%= link_to "Iniciar Sesión", login_path %>
+<% end %>
