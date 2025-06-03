@@ -1,0 +1,90 @@
+<%# app/views/checkouts/new.html.erb %>
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-4xl font-bold text-center mb-10 text-gray-800">Finalizar Compra</h1>
+
+  <div class="bg-white shadow-xl rounded-lg overflow-hidden p-6 md:p-8 max-w-2xl mx-auto">
+    <h2 class="text-2xl font-semibold mb-6 text-gray-700 border-b pb-4">Información de Facturación</h2>
+
+    <%# Mostrar errores de validación si existen %>
+    <% if @billing_address.errors.any? %>
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-md mb-6" role="alert">
+        <p class="font-bold">¡Por favor, corrige los siguientes errores!</p>
+        <ul class="mt-2 list-disc list-inside">
+          <% @billing_address.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%= form_with(model: @billing_address, url: checkout_path, local: true, class: "space-y-6") do |form| %>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <%# Nombre %>
+        <div>
+          <%= form.label :first_name, "Nombre:", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.text_field :first_name, class: "mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-base", required: true %>
+        </div>
+
+        <%# Apellido %>
+        <div>
+          <%= form.label :last_name, "Apellido:", class: "block text-sm font-medium text-gray-700 mb-1" %>
+          <%= form.text_field :last_name, class: "mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-base", required: true %>
+        </div>
+      </div>
+
+      <%# Número de Identificación (Cédula) %>
+      <div>
+        <%= form.label :identification_number, "Número de Identificación (Cédula):", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :identification_number, class: "mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-base", required: true, pattern: "\\d{10}", title: "Debe ser exactamente 10 dígitos numéricos." %>
+        <p class="mt-1 text-sm text-gray-500">Debe ser exactamente 10 dígitos numéricos.</p>
+      </div>
+
+      <%# País (por ahora, un campo de texto simple, luego lo haremos dropdown dinámico) %>
+      <div>
+        <%= form.label :country, "País:", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :country, class: "mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-base", required: true %>
+      </div>
+
+      <%# Provincia/Estado %>
+      <div>
+        <%= form.label :province, "Provincia/Estado:", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :province, class: "mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-base", required: true %>
+      </div>
+
+      <%# Ciudad %>
+      <div>
+        <%= form.label :city, "Ciudad:", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :city, class: "mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-base", required: true %>
+      </div>
+
+      <%# Dirección de Calle %>
+      <div>
+        <%= form.label :address, "Dirección de Calle:", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :address, class: "mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-base", required: true %>
+      </div>
+
+      <%# Número de Teléfono %>
+      <div>
+        <%= form.label :phone_number, "Número de Teléfono:", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :phone_number, class: "mt-1 block w-full py-2 px-3 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-base", required: true %>
+      </div>
+
+      <div class="pt-4 border-t border-gray-200 mt-8">
+        <h3 class="text-xl font-semibold mb-4 text-gray-700">Resumen del Pedido</h3>
+        <div class="flex justify-between items-center text-lg font-bold text-gray-800">
+          <span>Total del Carrito:</span>
+          <span>$<%= number_to_currency(@cart.total_amount, unit: "", separator: ",", delimiter: ".") %></span>
+        </div>
+      </div>
+
+      <div class="mt-8">
+        <%= form.submit "Confirmar Pedido", class: "w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg cursor-pointer transition duration-300 ease-in-out transform hover:scale-105" %>
+      </div>
+    <% end %>
+
+    <div class="mt-6 text-center">
+      <%= link_to "← Volver al Carrito", cart_path, class: "text-blue-600 hover:underline font-semibold text-base" %>
+    </div>
+  </div>
+</div>

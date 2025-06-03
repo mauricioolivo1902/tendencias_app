@@ -1,0 +1,69 @@
+<%# app/views/carts/show.html.erb %>
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-4xl font-bold text-center mb-10 text-gray-800">Tu Carrito de Compras</h1>
+
+  <% if @cart.order_items.empty? %>
+    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded-lg shadow-md text-center" role="alert">
+      <p class="font-bold text-xl mb-3">¡Tu carrito está vacío!</p>
+      <p class="text-lg">Parece que aún no has añadido ningún producto. ¡Explora nuestro <span class="font-semibold">catálogo</span> y personaliza tus favoritos!</p>
+      <%= link_to "Ir al Catálogo", products_path, class: "mt-6 inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full transition duration-300 ease-in-out transform hover:scale-105 shadow-lg" %>
+    </div>
+  <% else %>
+    <div class="bg-white shadow-xl rounded-lg overflow-hidden">
+      <div class="p-6 sm:p-8">
+        <h2 class="text-2xl font-semibold mb-8 text-gray-700 border-b pb-4">Productos en tu Carrito</h2>
+
+        <div class="divide-y divide-gray-200">
+          <% @cart.order_items.each do |item| %>
+            <div class="py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between">
+              <div class="flex items-center space-x-4 mb-4 sm:mb-0">
+                <%# Imagen del producto (placeholder si no hay o si es una ruta local no existente) %>
+                <%
+                  final_image_src = "https://placehold.co/100x100/E0E0E0/666666?text=Producto"
+                  if item.product.image_url.present?
+                    if item.product.image_url.start_with?('http://', 'https://')
+                      final_image_src = item.product.image_url
+                    end
+                  end
+                %>
+                <%= image_tag final_image_src, alt: item.product.name, class: "w-24 h-24 object-cover rounded-lg shadow-sm" %>
+                <div>
+                  <h3 class="text-xl font-semibold text-gray-800 mb-1"><%= item.product.name %></h3>
+                  <p class="text-base text-gray-600 mb-1">
+                    Frase: "<span class="font-medium text-indigo-700"><%= item.motivational_phrase.content.truncate(50) %></span>"
+                  </p>
+                </div>
+              </div>
+
+
+              <div class="text-left sm:text-right w-full sm:w-auto flex flex-col items-start sm:items-end">
+                <p class="text-xl font-bold text-green-600 mb-4">$<%= number_to_currency(item.price_at_purchase * item.quantity, unit: "", separator: ",", delimiter: ".") %></p>
+
+                <%# Formulario para actualizar cantidad %>
+                <%# Eliminamos 'url: order_item_path(item)' para que Rails lo infiera del 'model: item' %>
+                <%= form_with(model: item, method: :patch, local: true, class: "flex items-center space-x-2 mb-2") do |f| %>
+                  <%= f.number_field :quantity, value: item.quantity, min: 0, class: "w-20 py-1 px-2 border border-gray-300 rounded-md text-center focus:ring-blue-500 focus:border-blue-500" %>
+                  <%= f.submit "Actualizar", class: "bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-1 px-3 rounded-md text-sm cursor-pointer transition duration-200" %>
+                <% end %>
+
+                <%# Botón para eliminar %>
+                <%# Eliminamos 'order_item_path(item)' y usamos 'item' directamente para que Rails infiera la ruta DELETE %>
+                <%= link_to "Eliminar", item, data: { "turbo-method": :delete, turbo_confirm: "¿Estás seguro de que quieres eliminar este producto del carrito?" }, class: "text-red-600 hover:text-red-800 text-sm font-semibold transition duration-200" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="mt-10 pt-6 border-t-2 border-gray-200 flex flex-col sm:flex-row justify-between items-center sm:items-end">
+          <p class="text-2xl font-bold text-gray-800 mb-4 sm:mb-0">Total del Carrito:</p>
+          <p class="text-4xl font-extrabold text-green-700">$<%= number_to_currency(@cart.total_amount, unit: "", separator: ",", delimiter: ".") %></p>
+        </div>
+
+        <div class="mt-10 text-center flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-6">
+          <%= link_to "Proceder al Checkout", new_checkout_path, class: "inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 ease-in-out transform hover:scale-105" %>
+          <%= link_to "Seguir Comprando", products_path, class: "inline-block text-blue-600 hover:underline py-3 px-4 font-semibold" %>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

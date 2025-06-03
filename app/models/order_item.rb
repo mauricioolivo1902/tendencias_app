@@ -1,12 +1,10 @@
+# app/models/order_item.rb
 class OrderItem < ApplicationRecord
-  belongs_to :order
   belongs_to :product
-  belongs_to :motivational_phrase # Si en la migración pusiste null: false para motivational_phrase_id, esta relación es obligatoria.
-                                  # Si motivational_phrase_id puede ser null, podrías añadir `optional: true` aquí:
-                                  # belongs_to :motivational_phrase, optional: true
-                                  # Pero como sugerí hacerla obligatoria, no necesitamos `optional: true`.
+  belongs_to :motivational_phrase
+  belongs_to :cart, optional: true # Puede ser nulo si se mueve a una SalesOrder
+  belongs_to :sales_order, optional: true # Puede ser nulo si está en el carrito
 
-  # Validaciones
-  validates :quantity, presence: true, numericality: { only_integer: true, greater_than: 0 }
-  validates :price_at_purchase, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validates :quantity, presence: true, numericality: { greater_than_or_equal_to: 0 } # Permite 0 para eliminar
+  validates :price_at_purchase, presence: true, numericality: { greater_than: 0 }
 end

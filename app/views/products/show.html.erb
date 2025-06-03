@@ -1,38 +1,56 @@
 <%# app/views/products/show.html.erb %>
 <div class="container mx-auto px-4 py-8">
-  <div class="bg-white rounded-lg shadow-lg overflow-hidden md:flex">
+  <div class="bg-white rounded-xl shadow-xl overflow-hidden md:flex md:items-center"> <%# Añadido md:items-center para alinear verticalmente %>
     <%# Columna de la Imagen %>
-    <div class="md:w-1/2">
-      <%= image_tag @product.image_url, alt: @product.name, class: "w-full h-auto md:h-full object-cover" rescue image_tag "placeholder_product.png", class: "w-full h-auto md:h-full object-cover" %>
+    <div class="md:w-1/2 p-4"> <%# Añadido padding a la columna de imagen %>
+      <%
+        # Lógica para manejar URLs de imagen:
+        # Si la URL del producto es una URL completa (http/https), la usa.
+        # Si es un nombre de archivo local (ej. "agenda.jpg") o no existe, usa el placeholder.
+        # Esto evita el error Propshaft::MissingAssetError.
+        product_image_src = "https://placehold.co/600x400/E0E0E0/666666?text=Producto" # Placeholder por defecto
+        if @product.image_url.present?
+          if @product.image_url.start_with?('http://', 'https://')
+            product_image_src = @product.image_url
+          end
+        end
+      %>
+      <%= image_tag product_image_src, alt: @product.name, class: "w-full h-auto object-cover rounded-lg shadow-md" %>
     </div>
 
     <%# Columna de Información y Personalización %>
     <div class="p-6 md:w-1/2 flex flex-col justify-between">
       <div>
-        <h1 class="text-3xl font-bold mb-3"><%= @product.name %></h1>
-        <p class="text-gray-700 mb-4"><%= @product.description %></p>
-        <p class="text-2xl font-bold text-green-600 mb-6">$<%= number_to_currency(@product.price, unit: "", separator: ",", delimiter: ".") %></p>
+        <h1 class="text-4xl font-extrabold mb-4 text-gray-900"><%= @product.name %></h1>
+        <p class="text-gray-700 text-lg leading-relaxed mb-6"><%= @product.description %></p>
+        <p class="text-3xl font-bold text-green-700 mb-8">$<%= number_to_currency(@product.price, unit: "", separator: ",", delimiter: ".") %></p>
 
-        <%# Formulario para selección de frase y (futuro) añadir al carrito %>
-        <%# Por ahora, este formulario no hará nada al enviarse, es solo para la estructura visual %>
-        <%= form_with(url: "#", local: true, method: :post, data: { product_id: @product.id }) do |form| %>
-          <div class="mb-4">
-            <%= form.label :motivational_phrase_id, "Elige tu Frase Motivacional:", class: "block text-sm font-medium text-gray-700 mb-1" %>
-            <%= form.collection_select :motivational_phrase_id, @motivational_phrases, :id, :content,
-                { prompt: "Selecciona una frase..." },
-                { class: "mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", required: true } %>
-            <%# collection_select(objeto, método_del_objeto, colección, value_method, text_method, opciones_prompt, opciones_html) %>
+        <%# Formulario para selección de frase y añadir al carrito %>
+        <%= form_with(url: order_items_path, local: true, method: :post, class: "space-y-6") do |form| %> <%# Añadido space-y-6 para espaciado vertical %>
+          <%= form.hidden_field :product_id, value: @product.id %>
+
+          <%# Campo para Cantidad %>
+          <div>
+            <%= form.label :quantity, "Cantidad:", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.number_field :quantity, value: 1, min: 1, class: "block w-24 py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-base" %> <%# Ajustado ancho y foco %>
           </div>
 
-          <div class="mt-6">
-            <%# TODO: Este botón eventualmente añadirá al carrito %>
-            <%= form.submit "Añadir al Carrito (Personalizado)", class: "w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded cursor-pointer" %>
+          <%# Campo para Frase Motivacional %>
+          <div>
+            <%= form.label :motivational_phrase_id, "Elige tu Frase Motivacional:", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.collection_select :motivational_phrase_id, @motivational_phrases, :id, :content,
+                { prompt: "Selecciona una frase..." },
+                { class: "block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-base", required: true } %> <%# Ajustado foco %>
+          </div>
+
+          <div class="pt-4"> <%# Añadido padding superior para separar del select %>
+            <%= form.submit "Añadir al Carrito (Personalizado)", class: "w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-lg cursor-pointer transition duration-300 ease-in-out transform hover:scale-105" %> <%# Estilos de botón mejorados %>
           </div>
         <% end %>
       </div>
 
-      <div class="mt-6">
-        <%= link_to "← Volver al Catálogo", products_path, class: "text-blue-500 hover:underline" %>
+      <div class="mt-8 text-center md:text-left"> <%# Ajustado alineación para móvil y desktop %>
+        <%= link_to "← Volver al Catálogo", products_path, class: "text-blue-600 hover:underline font-semibold text-lg" %>
       </div>
     </div>
   </div>

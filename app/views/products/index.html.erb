@@ -1,54 +1,56 @@
 <%# app/views/products/index.html.erb %>
 <div class="container mx-auto px-4 py-8"> <%# Contenedor principal con padding y centrado %>
-  <h1 class="text-3xl font-bold text-center mb-8">Nuestros Productos 10dencias</h1>
+  <h1 class="text-4xl font-bold text-center mb-10 text-gray-800">Explora Nuestras 10dencias</h1>
 
   <% if @products.any? %>
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
       <%# Tailwind CSS Grid:
-           - grid: Activa CSS Grid.
-           - grid-cols-1: 1 columna en pantallas pequeñas (móviles).
-           - sm:grid-cols-2: 2 columnas en pantallas pequeñas (sm) y mayores.
-           - md:grid-cols-3: 3 columnas en pantallas medianas (md) y mayores.
-           - lg:grid-cols-4: 4 columnas en pantallas grandes (lg) y mayores.
-           - gap-6: Espacio entre los elementos de la cuadrícula.
+          - grid: Activa CSS Grid.
+          - grid-cols-1: 1 columna en pantallas pequeñas (móviles).
+          - sm:grid-cols-2: 2 columnas en pantallas pequeñas (sm) y mayores.
+          - md:grid-cols-3: 3 columnas en pantallas medianas (md) y mayores.
+          - lg:grid-cols-4: 4 columnas en pantallas grandes (lg) y mayores.
+          - gap-8: Espacio entre los elementos de la cuadrícula (aumentado ligeramente para más aire).
       %>
       <% @products.each do |product| %>
-        <div class="bg-white rounded-lg shadow-lg overflow-hidden flex flex-col"> <%# Tarjeta de producto con Flexbox para alinear contenido interno %>
-          <%# Imagen del Producto (Placeholder) %>
-          <%# Deberás tener imágenes en app/assets/images/ o usar URLs completas %>
-          <%# Por ahora, usamos un placeholder simple si la imagen no se encuentra o es un placeholder. %>
-          <%= image_tag product.image_url, alt: product.name, class: "w-full h-48 object-cover" rescue image_tag "placeholder_product.png", class: "w-full h-48 object-cover" %>
-          <%# 'rescue' es una forma simple de manejar errores si la imagen no existe.
-              Crea un archivo 'placeholder_product.png' en 'app/assets/images/' para que esto funcione como fallback.
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden flex flex-col transform transition duration-300 hover:scale-105 hover:shadow-xl"> <%# Tarjeta de producto con Flexbox para alinear contenido interno y efectos hover %>
+          <%# Imagen del Producto (Placeholder robusto) %>
+          <%
+            # Lógica para manejar URLs de imagen:
+            # Si la URL del producto es una URL completa (http/https), la usa.
+            # Si es un nombre de archivo local (ej. "agenda.jpg") o no existe, usa el placeholder.
+            # Esto evita el error Propshaft::MissingAssetError.
+            product_image_src = "https://placehold.co/400x300/E0E0E0/666666?text=Producto" # Placeholder por defecto
+            if product.image_url.present?
+              if product.image_url.start_with?('http://', 'https://')
+                product_image_src = product.image_url
+              end
+            end
           %>
+          <%= image_tag product_image_src, alt: product.name, class: "w-full h-48 object-cover" %>
 
-          <div class="p-4 flex-grow flex flex-col"> <%# Contenido de la tarjeta, flex-grow para que ocupe espacio disponible %>
-            <h2 class="text-xl font-semibold mb-2"><%= link_to product.name, product_path(product), class: "hover:text-blue-600" %></h2>
-            <p class="text-gray-700 text-sm mb-3 flex-grow"><%= product.description %></p> <%# flex-grow para que la descripción empuje el precio hacia abajo %>
+          <div class="p-5 flex-grow flex flex-col"> <%# Contenido de la tarjeta, flex-grow para que ocupe espacio disponible %>
+            <h2 class="text-2xl font-bold mb-2 text-gray-800"><%= link_to product.name, product_path(product), class: "hover:text-blue-600 transition duration-300" %></h2>
+            <p class="text-gray-700 text-base mb-4 flex-grow overflow-hidden text-ellipsis"><%= product.description.truncate(100) %></p> <%# flex-grow para que la descripción empuje el precio hacia abajo %>
 
-            <div class="mt-auto"> <%# Contenedor para alinear precio y botón al final %>
-              <p class="text-lg font-bold text-green-600 mb-3">$<%= number_to_currency(product.price, unit: "", separator: ",", delimiter: ".") %></p>
-              <%# number_to_currency es un helper de Rails para formatear precios. Ajusta unit, separator, delimiter según necesites. %>
-              <%# Por ahora, lo dejamos sencillo asumiendo que el precio es un número. %>
-              <%# Si product.price ya está formateado o es un string, solo usa product.price %>
+            <div class="mt-auto pt-4 border-t border-gray-200"> <%# Contenedor para alinear precio y botón al final %>
+              <p class="text-xl font-bold text-green-700 mb-4">$<%= number_to_currency(product.price, unit: "", separator: ",", delimiter: ".") %></p>
 
-              <%# TODO: Aquí irá el botón/enlace para personalizar y añadir al carrito %>
-              <button class="w-full bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                Personalizar
-              </button>
+              <%# Botón/enlace para personalizar y añadir al carrito %>
+              <%= link_to "Personalizar", product_path(product), class: "w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 text-center" %>
             </div>
           </div>
         </div>
       <% end %>
     </div>
   <% else %>
-    <p class="text-center text-gray-600">No hay productos disponibles en este momento. ¡Vuelve pronto!</p>
+    <p class="text-center text-gray-600 text-lg">No hay productos disponibles en este momento. ¡Vuelve pronto!</p>
   <% end %>
 
   <%# Enlace temporal para ir al panel de admin (solo para desarrollo) %>
   <% if Rails.env.development? %>
     <div class="mt-12 text-center">
-      <%= link_to "Panel de Administrador", admin_dashboard_path, class: "text-blue-500 hover:underline" %>
+      <%= link_to "Panel de Administrador", admin_dashboard_path, class: "text-blue-500 hover:underline text-lg" %>
     </div>
   <% end %>
 </div>

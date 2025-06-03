@@ -10,7 +10,28 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_06_02_004237) do
+ActiveRecord::Schema[8.0].define(version: 2025_06_03_031127) do
+  create_table "billing_addresses", force: :cascade do |t|
+    t.string "first_name"
+    t.string "last_name"
+    t.string "identification_number"
+    t.string "country"
+    t.string "province"
+    t.string "city"
+    t.string "address"
+    t.string "phone_number"
+    t.integer "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_billing_addresses_on_user_id"
+  end
+
+  create_table "carts", force: :cascade do |t|
+    t.decimal "total_amount", precision: 10, scale: 2, default: "0.0"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "cities", force: :cascade do |t|
     t.string "name"
     t.integer "province_id", null: false
@@ -32,16 +53,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_02_004237) do
   end
 
   create_table "order_items", force: :cascade do |t|
-    t.integer "order_id", null: false
     t.integer "product_id", null: false
     t.integer "motivational_phrase_id", null: false
-    t.integer "quantity"
-    t.decimal "price_at_purchase"
+    t.integer "quantity", default: 1
+    t.decimal "price_at_purchase", precision: 10, scale: 2
+    t.integer "cart_id"
+    t.integer "sales_order_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["cart_id"], name: "index_order_items_on_cart_id"
     t.index ["motivational_phrase_id"], name: "index_order_items_on_motivational_phrase_id"
-    t.index ["order_id"], name: "index_order_items_on_order_id"
     t.index ["product_id"], name: "index_order_items_on_product_id"
+    t.index ["sales_order_id"], name: "index_order_items_on_sales_order_id"
   end
 
   create_table "orders", force: :cascade do |t|
@@ -68,6 +91,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_02_004237) do
     t.index ["country_id"], name: "index_provinces_on_country_id"
   end
 
+  create_table "sales_orders", force: :cascade do |t|
+    t.integer "billing_address_id", null: false
+    t.decimal "total_amount"
+    t.string "status", default: "pending"
+    t.string "order_number"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["billing_address_id"], name: "index_sales_orders_on_billing_address_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email"
     t.string "password_digest"
@@ -77,9 +110,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_06_02_004237) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  add_foreign_key "billing_addresses", "users"
   add_foreign_key "cities", "provinces"
+  add_foreign_key "order_items", "carts"
   add_foreign_key "order_items", "motivational_phrases"
-  add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "products"
+  add_foreign_key "order_items", "sales_orders"
   add_foreign_key "provinces", "countries"
+  add_foreign_key "sales_orders", "billing_addresses"
 end
