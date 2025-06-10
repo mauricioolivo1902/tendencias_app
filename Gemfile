@@ -51,7 +51,7 @@ gem "thruster", require: false
 
 group :development, :test do
   # SQLite3 solo para desarrollo y pruebas
-  gem "sqlite3", "~> 1.7.3" # Asegúrate de que esta línea esté aquí con la versión correcta
+  gem "sqlite3", "~> 2.7.0" # Asegúrate de que esta línea esté aquí con la versión correcta
 
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
